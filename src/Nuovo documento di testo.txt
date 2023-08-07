@@ -1,0 +1,95 @@
+package raccoltaClassi;
+import java.io.*;
+import java.lang.Math;
+import java.math.BigInteger;
+
+public class RSA {
+	
+	public long n;
+	private int z;
+	private int p;
+	private int q;
+	public int priv;
+	public int pub;
+	NumPrimi nmp= new NumPrimi();
+	
+	
+	public RSA(int p,int q) {
+		Rsa(p,q);
+	}
+	
+	private void Rsa(int p,int q) {
+		this.p=p;
+		this.q=q;
+		
+		this.n=p*q;
+		this.z=(p-1)*(q-1);
+		
+		this.priv=nmp.privato(z);
+		this.pub=(z+resto())/priv;
+		
+		System.out.println("Chiave pubblica: ("+n+","+pub+")"+"\n"+"Chiave privata: ("+n+","+priv+")");
+		
+		
+	}
+	
+	private int resto() {
+		int n=0;
+		n=priv-(z%priv);
+		return n;
+	}
+	
+	public int[] Codifica(String f) {
+		char[] array=f.toCharArray();
+		int[] fnew = new int[array.length];
+		char[] alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVZ1234567890.,;: ".toCharArray();
+		int[] numbers = new int[alphabet.length];
+		
+		try{
+			for (int i = 0; i < alphabet.length; i++) {
+		    numbers[i] = i ;
+		}
+		}catch(Exception E) {
+			System.out.println(E.getMessage());
+		}
+		
+
+		for(int i = 0;i< array.length;i++) {
+			for(int y=0;y<alphabet.length;y++) {
+				
+				if (array[i]==alphabet[y]) {
+					long d= (long) Math.pow(y,pub);
+					long c= (long) d%n;
+					fnew[i]=(int)c;
+				}
+			}
+		}
+		return fnew;
+	}
+	
+	public char[] Decodifica(int[] array) {
+		char[] alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVZ1234567890.,;: ".toCharArray();
+		int[] numbers = new int[alphabet.length];
+		char[] arr= new char[array.length];
+		
+		try{
+			for (int i = 0; i < alphabet.length; i++) {
+		    numbers[i] = i ;
+		}
+		}catch(Exception E) {
+			System.out.println(E.getMessage());
+		}
+		
+		for(int i=0;i<array.length;i++) {
+			long d=(long) Math.pow(array[i], priv);
+			long m=Math.floorMod(d,n);
+			for (int y=0;y<numbers.length;y++) {
+				if(m==numbers[y]) {
+					arr[i]=alphabet[y];
+				}
+			}
+		}
+		
+		return arr;
+	}
+}
